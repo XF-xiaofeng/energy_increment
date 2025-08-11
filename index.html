@@ -3039,6 +3039,15 @@
                                     </div>
                                 </a>
                             </div>
+                            <div class="upgrade_button">
+                                <a href="javascript:energy_upgrade2('handle');">
+                                    <div>
+                                        改良铜线<br>
+                                        效果：手摇发电生产效率*4 <br>
+                                        花费 <span id="handle_cost_of_upgrade2">5.0</span> J
+                                    </div>
+                                </a>
+                            </div>
                         </div>
                     </div>
                     <div id="water" style="display: none;">
@@ -3047,7 +3056,7 @@
                             <a id="button_of_unlocking_water" href="javascript:energy_unlock('water','1e4');">
                                 <div>
                                     解锁水力发电<br>
-                                    花费 1e4 J
+                                    花费 1e3 J
                                 </div>
                             </a>
                         </div>
@@ -3354,6 +3363,104 @@
         }
     </script>
 
+
+    <!-- 常量 -->
+    <script>
+
+        const locked_id = [
+            "handle",//手摇发电
+            "water",//水车
+            "wind",//风力发电
+            "steam",//蒸汽动力
+            "fire",//火力发电
+            "sun",//太阳能
+            "earth",//地热能
+            "Uenergy",//核能
+        ];
+        const list_unlock_cost = [//解锁需花费
+            new BigNumber("1"),
+            new BigNumber("1e3"),
+            new BigNumber("1e18"),
+            new BigNumber("1e40"),
+            new BigNumber("1e60"),
+            new BigNumber("1e95"),
+            new BigNumber("1e140"),
+            new BigNumber("1e300"),
+        ];
+        const list_jps = [//初始生产效率
+            new BigNumber("0.1"),
+            new BigNumber("1e2"),
+            new BigNumber("1e7"),
+            new BigNumber("1e11"),
+            new BigNumber("1e40"),
+            new BigNumber("1e70"),
+            new BigNumber("1e120"),
+            new BigNumber("1e300"),
+        ];
+        const list_ucb = [//每次升级价格提升多少倍
+            new BigNumber("1.3"),
+            new BigNumber("2"),
+            new BigNumber("3"),
+            new BigNumber("1e11"),
+            new BigNumber("1e40"),
+            new BigNumber("1e70"),
+            new BigNumber("1e120"),
+            new BigNumber("1e300"),
+        ];
+        const list_upgrade_cost = [//初始升级花费
+            new BigNumber("3"),
+            new BigNumber("3e4"),
+            new BigNumber("3e18"),
+            new BigNumber("3e40"),
+            new BigNumber("3e60"),
+            new BigNumber("3e95"),
+            new BigNumber("3e140"),
+            new BigNumber("3e300"),
+        ];
+        const list_upgrade_ucb_times = [//每次升级效率提升多少倍
+            new BigNumber("1.1"),
+            new BigNumber("1.3"),
+            new BigNumber("3e18"),
+            new BigNumber("3e40"),
+            new BigNumber("3e60"),
+            new BigNumber("3e95"),
+            new BigNumber("3e140"),
+            new BigNumber("3e300"),
+        ];
+        const list_ucb2 = [
+            new BigNumber("10"),
+            new BigNumber("2"),
+            new BigNumber("3"),
+            new BigNumber("1e11"),
+            new BigNumber("1e40"),
+            new BigNumber("1e70"),
+            new BigNumber("1e120"),
+            new BigNumber("1e300"),
+        ];
+        const list_upgrade_cost2 = [
+            new BigNumber("5"),
+            new BigNumber("3e4"),
+            new BigNumber("3e18"),
+            new BigNumber("3e40"),
+            new BigNumber("3e60"),
+            new BigNumber("3e95"),
+            new BigNumber("3e140"),
+            new BigNumber("3e300"),
+        ];
+        const list_upgrade_ucb_times2 = [
+            new BigNumber("4"),
+            new BigNumber("1.3"),
+            new BigNumber("3e18"),
+            new BigNumber("3e40"),
+            new BigNumber("3e60"),
+            new BigNumber("3e95"),
+            new BigNumber("3e140"),
+            new BigNumber("3e300"),
+        ];
+
+    </script>
+
+
     <script>
         function make_gameData_save_string() {
             game_data.save = "energy:" + energy;
@@ -3366,12 +3473,17 @@
             for (let i = 0; i < locked_id.length; i++) {
                 game_data.save += (i > 0 ? "," : "") + locked_id[i] + "=" + (level_of_machines[locked_id[i]] == undefined ? 0 : level_of_machines[locked_id[i]]);
             }
+            game_data.save += "|level_of_machines2:";
+            for (let i = 0; i < locked_id.length; i++) {
+                game_data.save += (i > 0 ? "," : "") + locked_id[i] + "=" + (level_of_machines2[locked_id[i]] == undefined ? 0 : level_of_machines2[locked_id[i]]);
+            }
             //console.log(game_data.save);
         }
         function init_all_value() {
             energy = new BigNumber("1");
             state_of_unlocked = [];
-            level_of_machines = [[]];
+            level_of_machines = [];
+            level_of_machines2 = [];
             location.reload();
         }
 
@@ -3379,92 +3491,44 @@
 
 
         let energy = new BigNumber("1.0");
-
-
-        const locked_id = [
-            "handle",//手摇发电
-            "water",//风力发电
-            "wind",//水车
-            "steam",//蒸汽动力
-            "fire",//火力发电
-            "sun",//太阳能
-            "earth",//地热能
-            "Uenergy",//核能
-        ];
-        const list_unlock_cost = [
-            new BigNumber("1"),
-            new BigNumber("1e4"),
-            new BigNumber("1e18"),
-            new BigNumber("1e40"),
-            new BigNumber("1e60"),
-            new BigNumber("1e95"),
-            new BigNumber("1e140"),
-            new BigNumber("1e300"),
-        ];
-        const list_jps = [
-            new BigNumber("0.1"),
-            new BigNumber("1e2"),
-            new BigNumber("1e7"),
-            new BigNumber("1e11"),
-            new BigNumber("1e40"),
-            new BigNumber("1e70"),
-            new BigNumber("1e120"),
-            new BigNumber("1e300"),
-        ];
-        const list_ucb = [
-            new BigNumber("1.3"),
-            new BigNumber("2"),
-            new BigNumber("3"),
-            new BigNumber("1e11"),
-            new BigNumber("1e40"),
-            new BigNumber("1e70"),
-            new BigNumber("1e120"),
-            new BigNumber("1e300"),
-        ];
-        const list_upgrade_cost = [
-            new BigNumber("3"),
-            new BigNumber("3e4"),
-            new BigNumber("3e18"),
-            new BigNumber("3e40"),
-            new BigNumber("3e60"),
-            new BigNumber("3e95"),
-            new BigNumber("3e140"),
-            new BigNumber("3e300"),
-        ];
-        const list_upgrade_ucb_times = [
-            new BigNumber("1.1"),
-            new BigNumber("1.3"),
-            new BigNumber("3e18"),
-            new BigNumber("3e40"),
-            new BigNumber("3e60"),
-            new BigNumber("3e95"),
-            new BigNumber("3e140"),
-            new BigNumber("3e300"),
-        ];
         let initial_jps = [];
+
         let state_of_unlocked = [];
+
         let level_of_machines = [];
+        let level_of_machines2 = [];
+
         let joule_per_second;
-        let initial_upgrade_cost = [];
+
         let unlock_cost = [];
+
+        let initial_upgrade_cost = [];
+        let initial_upgrade_cost2 = [];
+
         let upgrade_cost_boost = [];
+        let upgrade_cost_boost2 = [];
+
         let upgrade_ucb_times = [];
+        let upgrade_ucb_times2 = [];
 
 
         for (var i = 0; i < locked_id.length; i++) {
             initial_jps[locked_id[i]] = list_jps[i];
             level_of_machines[locked_id[i]] = new BigNumber("0");
             unlock_cost[locked_id[i]] = list_unlock_cost[i];
-            upgrade_cost_boost[locked_id[i]] = list_ucb[i];
             initial_upgrade_cost[locked_id[i]] = list_upgrade_cost[i];
+            upgrade_cost_boost[locked_id[i]] = list_ucb[i];
             upgrade_ucb_times[locked_id[i]] = list_upgrade_ucb_times[i];
+            initial_upgrade_cost2[locked_id[i]] = list_upgrade_cost2[i];
+            upgrade_cost_boost2[locked_id[i]] = list_ucb2[i];
+            upgrade_ucb_times2[locked_id[i]] = list_upgrade_ucb_times2[i];
         }
 
-
+        let tps = 40;//1 tick  ->  1/40 s
         //console.log(game_data);
         let t = setInterval(function () {
             upd();
-        }, 25);
+        }, 1000 / tps);
 
 
         let temperature_first_load = false;
@@ -3499,6 +3563,15 @@
                             //console.log(j, state_of_unlocked_name[j], state_of_unlocked_key, state_of_unlocked_val);
                         }
                     }
+                    if (key == 'level_of_machines2') {
+                        //console.log(val)
+                        state_of_unlocked_name = val.split(",");
+                        for (let j = 0; j < state_of_unlocked_name.length; j++) {
+                            let state_of_unlocked_key = state_of_unlocked_name[j].split("=")[0], state_of_unlocked_val = new BigNumber(state_of_unlocked_name[j].split("=")[1]);
+                            level_of_machines2[state_of_unlocked_key] = new BigNumber(state_of_unlocked_val);
+                            //console.log(j, state_of_unlocked_name[j], state_of_unlocked_key, state_of_unlocked_val);
+                        }
+                    }
                 }
                 console.log("加载完成！！！！");
                 temperature_first_load = true;
@@ -3512,6 +3585,8 @@
                         let tmp = new BigNumber(initial_jps[locked_id[i]]);
                         //console.log(i, tmp.toFixed(4));
                         tmp = new BigNumber(initial_jps[locked_id[i]].times(upgrade_ucb_times[locked_id[i]].pow(level_of_machines[locked_id[i]].minus('1'))));
+                        tmp2 = new BigNumber(initial_jps[locked_id[i]].times(upgrade_ucb_times2[locked_id[i]].pow(level_of_machines2[locked_id[i]].minus('1'))));
+                        tmp = tmp.plus(tmp2);
                         //console.log(tmp.toFixed(4), initial_jps[locked_id[i]].times(upgrade_ucb_times[locked_id[i]].pow(level_of_machines[locked_id[i]].minus('1'))).toFixed(4));
                         //console.log(new BigNumber(level_of_machines[locked_id[i]]).div(10), tmp.toFixed(4));
                         document.getElementById(locked_id[i] + "_current_power").innerHTML = (tmp.lte(new BigNumber('100')) ? tmp.toFixed(2) : tmp.toExponential(2));
@@ -3524,7 +3599,7 @@
                 //console.log(joule_per_second.div(40).toFixed(20));
 
                 //console.log(1, energy);
-                energy = energy.plus(joule_per_second.div("40"));
+                energy = energy.plus(joule_per_second.div("40").times(new BigNumber(tps).div("40")));
                 //console.log(2, energy);
 
                 document.getElementById("total_power").innerHTML = (joule_per_second.lte(new BigNumber('100')) ? joule_per_second.toFixed(2) : joule_per_second.toExponential(2));
@@ -3534,8 +3609,12 @@
                     if (state_of_unlocked[locked_id[i]] == 'true') {
                         document.getElementById(locked_id[i] + "_unlock").style.display = 'none';
                         document.getElementById(locked_id[i] + "_upgrade").style.display = 'block';
+
                         let tmp = new BigNumber(initial_upgrade_cost[locked_id[i]].times(upgrade_cost_boost[locked_id[i]].pow(level_of_machines[locked_id[i]].minus('1'))).toExponential(2));
+                        let tmp2 = new BigNumber(initial_upgrade_cost2[locked_id[i]].times(upgrade_cost_boost2[locked_id[i]].pow(level_of_machines2[locked_id[i]].minus('1'))).toExponential(2));
+
                         document.getElementById(locked_id[i] + "_cost_of_upgrade").innerHTML = (tmp.lte(new BigNumber('100')) ? tmp.toFixed(2) : tmp.toExponential(2));
+                        document.getElementById(locked_id[i] + "_cost_of_upgrade2").innerHTML = (tmp2.lte(new BigNumber('100')) ? tmp2.toFixed(2) : tmp2.toExponential(2));
                         //console.log(initial_upgrade_cost[locked_id[i]].times(upgrade_cost_boost[locked_id[i]].pow(level_of_machines[locked_id[i]].minus('1'))).toExponential(2));
                     }
                 }
@@ -3579,6 +3658,7 @@
             if (unlock_cost[name].lte(energy)) {
                 energy = energy.minus(unlock_cost[name]);
                 level_of_machines[name] = new BigNumber('1');
+                level_of_machines2[name] = new BigNumber('1');
                 state_of_unlocked[name] = 'true';
             }
         }
@@ -3590,6 +3670,15 @@
                 //console.log("升级成功", tmp_cost);
                 energy = energy.minus(tmp_cost);
                 level_of_machines[name] = level_of_machines[name].plus('1');
+            }
+        }
+        function energy_upgrade2(name) {
+            let tmp_cost = new BigNumber(initial_upgrade_cost2[name].times(upgrade_cost_boost2[name].pow(level_of_machines2[name].minus('1'))));
+            //console.log(tmp_cost, energy);
+            if (tmp_cost.lte(energy)) {
+                //console.log("升级成功", tmp_cost);
+                energy = energy.minus(tmp_cost);
+                level_of_machines2[name] = level_of_machines2[name].plus('1');
             }
         }
 
