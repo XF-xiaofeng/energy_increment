@@ -6,9 +6,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>能量增量</title>
     <style>
+        body,
+        html {
+            background: linear-gradient(135deg,
+                    #00758c11 0%,
+                    #007eb311 33%,
+                    #008a6511 66%,
+                    #00b34711 100%);
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            /* 防止滚动条出现 */
+        }
+
         a {
             text-decoration: none !important;
             font-weight: bold;
+        }
+
+        #main {
+            margin: 2%;
         }
 
         .border {
@@ -47,6 +66,98 @@
             color: #444444;
             background-color: #aaaaaa;
             transition: background 0.2s ease;
+        }
+
+        #front_textbox {
+            /* display: flex; */
+            display: none;
+            transition: all 0.2s ease;
+            justify-content: center;
+            /* 水平居中 */
+            align-items: center;
+            /* 垂直居中 */
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: #00000055;
+        }
+
+        #front_textbox_box {
+            border-radius: 5%;
+            background-color: #ccffff;
+            display: flex;
+            flex-direction: column;
+            /* 改为垂直排列 */
+            justify-content: space-between;
+            /* 首尾分布 */
+            height: 40%;
+            width: 40%;
+            padding: 20px;
+            /* 增加内边距 */
+        }
+
+        #front_textbox_button_area {
+            position: relative;
+            width: 100%;
+            display: flex;
+            /* 改用flex布局 */
+            justify-content: space-around;
+            /* 按钮均匀分布 */
+            align-items: flex-end;
+            /* 底部对齐 */
+            padding-bottom: 5%;
+        }
+
+        #front_textbox_button_area a {
+            position: static;
+            /* 取消绝对定位 */
+            transform: none;
+            margin: 0 10px;
+            /* 增加按钮间距 */
+            bottom: 5%;
+            padding: 8px 15px;
+            background: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+
+        #front_textbox_button_area a:last-child {
+            background: #f44336;
+            right: 5%;
+            left: auto;
+            /* 覆盖默认值 */
+        }
+
+        #front_textbox_button_area a:hover {
+            transition: all 0.2s ease;
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .all_center {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #settings {
+            display: none;
+        }
+
+        #page {
+            margin: 1%;
+        }
+
+        #reset_game:hover {
+            transition: all 0.2s ease;
+            transform: translateY(-2px);
+            background-color: #dddddd;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .discription {
+            color: #333333;
         }
     </style>
 
@@ -2980,22 +3091,30 @@
 </head>
 
 <body>
-
+    <div id="loading" class="all_center" style="display: block; position: relative; width: 100%; height: 100%;">
+        <div style="font-size: 100px; font-weight: bold; color: #aaaaaa;">加 载 中 … …</div>
+    </div>
+    <div id="front_textbox">
+        <div id="front_textbox_box">
+            <div id="front_textbox_text_area"></div>
+            <div id="front_textbox_button_area"></div>
+        </div>
+    </div>
     <div id="main">
         <div id="head">
             <table border="1">
                 <tr>
                     <td>
-                        你有 <span id="energy">0.0</span> J 能量
+                        你有 <span id="energy">1.0</span> J 能量
                     </td>
                     <td>
-                        <a href="javascript:change_page('produce_energy')">能量生产</a>
+                        <a href="javascript:change_page('page','produce_energy')">能量生产</a>
                     </td>
                     <td>
-                        <a href="javascript:change_page('global_upgrades')">升级</a>
+                        <a href="javascript:change_page('page','global_upgrades')">升级</a>
                     </td>
                     <td>
-                        <a href="javascript:change_page('settings')">设置</a>
+                        <a href="javascript:change_page('page','settings')">设置</a>
                     </td>
                 </tr>
             </table>
@@ -3004,14 +3123,21 @@
         <div id="page">
             <div id="produce_energy">
                 <div id="table_of_upgrades" style="display: block;">
-                    <a href="javascript:change_page_of_energy('handle')">手摇发电</a>、
-                    <a href="javascript:change_page_of_energy('water')">水车</a>、
-                    <a href="javascript:change_page_of_energy('steam')">蒸汽动力</a>、
-                    <a href="javascript:change_page_of_energy('fire')">火力发电</a>、
-                    <a href="javascript:change_page_of_energy('wind')">风力发电</a>、
-                    <a href="javascript:change_page_of_energy('sun')">太阳能</a>、
-                    <a href="javascript:change_page_of_energy('earth')">地热能</a>、
-                    <a href="javascript:change_page_of_energy('Uenergy')">核能</a>
+                    <a href="javascript:change_page('ways_of_energy','handle')">手摇发电</a>
+                    &nbsp;&nbsp;|&nbsp;&nbsp;
+                    <a href="javascript:change_page('ways_of_energy','water')">水车</a>
+                    &nbsp;&nbsp;|&nbsp;&nbsp;
+                    <a href="javascript:change_page('ways_of_energy','steam')">蒸汽动力</a>
+                    &nbsp;&nbsp;|&nbsp;&nbsp;
+                    <a href="javascript:change_page('ways_of_energy','fire')">火力发电</a>
+                    &nbsp;&nbsp;|&nbsp;&nbsp;
+                    <a href="javascript:change_page('ways_of_energy','wind')">风力发电</a>
+                    &nbsp;&nbsp;|&nbsp;&nbsp;
+                    <a href="javascript:change_page('ways_of_energy','sun')">太阳能</a>
+                    &nbsp;&nbsp;|&nbsp;&nbsp;
+                    <a href="javascript:change_page('ways_of_energy','earth')">地热能</a>
+                    &nbsp;&nbsp;|&nbsp;&nbsp;
+                    <a href="javascript:change_page('ways_of_energy','Uenergy')">核能</a>
                 </div>
                 <div id="ways_of_energy">
                     <div>
@@ -3034,7 +3160,7 @@
                                 <a href="javascript:energy_upgrade('handle');">
                                     <div>
                                         改良手柄<br>
-                                        效果：手摇发电生产效率*1.1 <br>
+                                        效果：手摇发电生产效率 * 1.1 <br>
                                         花费 <span id="handle_cost_of_upgrade">3.0</span> J
                                     </div>
                                 </a>
@@ -3043,7 +3169,7 @@
                                 <a href="javascript:energy_upgrade2('handle');">
                                     <div>
                                         改良铜线<br>
-                                        效果：手摇发电生产效率*4 <br>
+                                        效果：手摇发电生产效率 * 4 <br>
                                         花费 <span id="handle_cost_of_upgrade2">5.0</span> J
                                     </div>
                                 </a>
@@ -3055,7 +3181,7 @@
                         <div class="border unlock_button" id="water_unlock" style="display: block;">
                             <a id="button_of_unlocking_water" href="javascript:energy_unlock('water','1e4');">
                                 <div>
-                                    解锁水力发电<br>
+                                    解锁水车<br>
                                     花费 1e3 J
                                 </div>
                             </a>
@@ -3067,8 +3193,50 @@
                                 <a href="javascript:energy_upgrade('water');">
                                     <div>
                                         改良水车<br>
-                                        效果：水力发电生产效率*1.2 <br>
+                                        效果：水车生产效率 * 1.2 <br>
                                         花费 <span id="water_cost_of_upgrade">3.0</span> J
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="upgrade_button">
+                                <a href="javascript:energy_upgrade2('water');">
+                                    <div>
+                                        改良传动装置<br>
+                                        效果：水车生产效率 * 6 <br>
+                                        花费 <span id="water_cost_of_upgrade2">3.0</span> J
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="steam" style="display: none;">
+                        <h2>蒸汽动力</h2>
+                        <div class="border unlock_button" id="steam_unlock" style="display: block;">
+                            <a id="button_of_unlocking_steam" href="javascript:energy_unlock('steam','1e18');">
+                                <div>
+                                    解锁蒸汽动力<br>
+                                    花费 1e7 J
+                                </div>
+                            </a>
+                        </div>
+                        <div class="border" id="steam_upgrade" style="display: none;">
+                            当前功率： <span id="steam_current_power">0.0</span> W
+                            <br>
+                            <div class="upgrade_button">
+                                <a href="javascript:energy_upgrade('steam');">
+                                    <div>
+                                        改良蒸汽机<br>
+                                        效果：蒸汽动力生产效率*1.5 <br>
+                                        花费 <span id="steam_cost_of_upgrade">3.0</span> J
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="upgrade_button">
+                                <a href="javascript:energy_upgrade2('steam');">
+                                    <div>
+                                        改良蒸汽机<br>
+                                        效果：蒸汽动力生产效率*10 <br>
+                                        花费 <span id="steam_cost_of_upgrade2">3.0</span> J
                                     </div>
                                 </a>
                             </div>
@@ -3090,33 +3258,18 @@
                             <div class="upgrade_button">
                                 <a href="javascript:energy_upgrade('wind');">
                                     <div>
-                                        改良风车<br>
-                                        效果：风车生产效率*1.1 <br>
+                                        改良风帆<br>
+                                        效果：风车生产效率*1.5 <br>
                                         花费 <span id="wind_cost_of_upgrade">3.0</span> J
                                     </div>
                                 </a>
                             </div>
-                        </div>
-                    </div>
-                    <div id="steam" style="display: none;">
-                        <h2>蒸汽动力</h2>
-                        <div class="border unlock_button" id="steam_unlock" style="display: block;">
-                            <a id="button_of_unlocking_steam" href="javascript:energy_unlock('steam','1e18');">
-                                <div>
-                                    解锁蒸汽动力<br>
-                                    花费 1e18 J
-                                </div>
-                            </a>
-                        </div>
-                        <div class="border" id="steam_upgrade" style="display: none;">
-                            当前功率： <span id="steam_current_power">0.0</span> W
-                            <br>
                             <div class="upgrade_button">
-                                <a href="javascript:energy_upgrade('steam');">
+                                <a href="javascript:energy_upgrade2('wind');">
                                     <div>
-                                        改良蒸汽机<br>
-                                        效果：蒸汽动力生产效率*1.1 <br>
-                                        花费 <span id="steam_cost_of_upgrade">3.0</span> J
+                                        改良轴承<br>
+                                        效果：风车生产效率*10 <br>
+                                        花费 <span id="wind_cost_of_upgrade2">3.0</span> J
                                     </div>
                                 </a>
                             </div>
@@ -3220,11 +3373,25 @@
                     </div>
                 </div>
             </div>
-            <div id="global_upgrades">
-
+            <div id="global_upgrades" style="display: none;">
+                <div>
+                    <div class="discription">
+                        速度提升：<br>
+                        通过消耗能量给全局生产速度得到提升：</div>
+                    <a href="javascript:tps_upgrade(1.2)" style="color: #0066cc;margin: 3px;
+                            border: 2px solid #0066cc;border-radius: 5px;
+                            width: 240px;height: 60px;" class="all_center" id="upgrade_tps">
+                        <div>
+                            <div style="margin: 1px;">提升游戏整体速度 *1.2 </div>
+                            <div style="margin: 1px;">花费 <span id="cost_of_tps_upgrade">10.00</span> J</div>
+                        </div>
+                    </a>
+                </div>
             </div>
-            <div id="settings" style="display: none;">
-                <a href="javascript:clearSave()">重置游戏</a>
+            <div id="settings">
+                <a href="javascript:open_textbox('clearSave')" style="color: #cc0000;margin: 3px;
+                          border: 2px solid #cc0000;border-radius: 5px;
+                          width: 100px;height: 30px;" class="all_center" id="reset_game">重置游戏</a>
             </div>
         </div>
     </div>
@@ -3367,6 +3534,8 @@
     <!-- 常量 -->
     <script>
 
+        const capped_of_toExponential = new BigNumber("1000");
+
         const locked_id = [
             "handle",//手摇发电
             "water",//水车
@@ -3380,7 +3549,7 @@
         const list_unlock_cost = [//解锁需花费
             new BigNumber("1"),
             new BigNumber("1e3"),
-            new BigNumber("1e18"),
+            new BigNumber("1e7"),
             new BigNumber("1e40"),
             new BigNumber("1e60"),
             new BigNumber("1e95"),
@@ -3390,7 +3559,7 @@
         const list_jps = [//初始生产效率
             new BigNumber("0.1"),
             new BigNumber("1e2"),
-            new BigNumber("1e7"),
+            new BigNumber("2e6"),
             new BigNumber("1e11"),
             new BigNumber("1e40"),
             new BigNumber("1e70"),
@@ -3410,7 +3579,7 @@
         const list_upgrade_cost = [//初始升级花费
             new BigNumber("3"),
             new BigNumber("3e4"),
-            new BigNumber("3e18"),
+            new BigNumber("5e7"),
             new BigNumber("3e40"),
             new BigNumber("3e60"),
             new BigNumber("3e95"),
@@ -3420,7 +3589,7 @@
         const list_upgrade_ucb_times = [//每次升级效率提升多少倍
             new BigNumber("1.1"),
             new BigNumber("1.3"),
-            new BigNumber("3e18"),
+            new BigNumber("1.5"),
             new BigNumber("3e40"),
             new BigNumber("3e60"),
             new BigNumber("3e95"),
@@ -3429,8 +3598,8 @@
         ];
         const list_ucb2 = [
             new BigNumber("10"),
-            new BigNumber("2"),
-            new BigNumber("3"),
+            new BigNumber("13"),
+            new BigNumber("19"),
             new BigNumber("1e11"),
             new BigNumber("1e40"),
             new BigNumber("1e70"),
@@ -3439,8 +3608,8 @@
         ];
         const list_upgrade_cost2 = [
             new BigNumber("5"),
-            new BigNumber("3e4"),
-            new BigNumber("3e18"),
+            new BigNumber("5e4"),
+            new BigNumber("2e8"),
             new BigNumber("3e40"),
             new BigNumber("3e60"),
             new BigNumber("3e95"),
@@ -3449,8 +3618,8 @@
         ];
         const list_upgrade_ucb_times2 = [
             new BigNumber("4"),
-            new BigNumber("1.3"),
-            new BigNumber("3e18"),
+            new BigNumber("6"),
+            new BigNumber("10"),
             new BigNumber("3e40"),
             new BigNumber("3e60"),
             new BigNumber("3e95"),
@@ -3477,6 +3646,7 @@
             for (let i = 0; i < locked_id.length; i++) {
                 game_data.save += (i > 0 ? "," : "") + locked_id[i] + "=" + (level_of_machines2[locked_id[i]] == undefined ? 0 : level_of_machines2[locked_id[i]]);
             }
+            game_data.save += "|level_of_tps:" + level_of_tps;
             //console.log(game_data.save);
         }
         function init_all_value() {
@@ -3484,6 +3654,7 @@
             state_of_unlocked = [];
             level_of_machines = [];
             level_of_machines2 = [];
+            level_of_tps = new BigNumber("1");
             location.reload();
         }
 
@@ -3511,8 +3682,10 @@
         let upgrade_ucb_times = [];
         let upgrade_ucb_times2 = [];
 
+        let level_of_tps = new BigNumber("1");
 
-        for (var i = 0; i < locked_id.length; i++) {
+
+        for (let i = 0; i < locked_id.length; i++) {
             initial_jps[locked_id[i]] = list_jps[i];
             level_of_machines[locked_id[i]] = new BigNumber("0");
             unlock_cost[locked_id[i]] = list_unlock_cost[i];
@@ -3524,15 +3697,15 @@
             upgrade_ucb_times2[locked_id[i]] = list_upgrade_ucb_times2[i];
         }
 
-        let tps = 40;//1 tick  ->  1/40 s
+        let tick_per_second = new BigNumber("40");//1 tick  ->  1/40 s
         //console.log(game_data);
         let t = setInterval(function () {
-            upd();
-        }, 1000 / tps);
+            update_game();
+        }, 25);
 
 
         let temperature_first_load = false;
-        function upd() {
+        function update_game() {
             //console.log(energy);
             //console.log(load_complete);
             //console.log(temperature_first_load);
@@ -3572,51 +3745,65 @@
                             //console.log(j, state_of_unlocked_name[j], state_of_unlocked_key, state_of_unlocked_val);
                         }
                     }
+                    if (key == 'level_of_tps') {
+                        //console.log(val)
+                        level_of_tps = new BigNumber(val);
+                    }
                 }
                 console.log("加载完成！！！！");
                 temperature_first_load = true;
+                document.getElementById("loading").style.display = "none";
             }
 
 
             if (temperature_first_load == true) {
-                joule_per_second = new BigNumber("0");//计算每秒获得的能量值
-                for (let i = 0; i < locked_id.length; i++) {
-                    if (state_of_unlocked[locked_id[i]] == 'true') {
-                        let tmp = new BigNumber(initial_jps[locked_id[i]]);
-                        //console.log(i, tmp.toFixed(4));
-                        tmp = new BigNumber(initial_jps[locked_id[i]].times(upgrade_ucb_times[locked_id[i]].pow(level_of_machines[locked_id[i]].minus('1'))));
-                        tmp2 = new BigNumber(initial_jps[locked_id[i]].times(upgrade_ucb_times2[locked_id[i]].pow(level_of_machines2[locked_id[i]].minus('1'))));
-                        tmp = tmp.plus(tmp2);
-                        //console.log(tmp.toFixed(4), initial_jps[locked_id[i]].times(upgrade_ucb_times[locked_id[i]].pow(level_of_machines[locked_id[i]].minus('1'))).toFixed(4));
-                        //console.log(new BigNumber(level_of_machines[locked_id[i]]).div(10), tmp.toFixed(4));
-                        document.getElementById(locked_id[i] + "_current_power").innerHTML = (tmp.lte(new BigNumber('100')) ? tmp.toFixed(2) : tmp.toExponential(2));
-                        //console.log(tmp.toExponential(2));
-                        joule_per_second = joule_per_second.plus(tmp);
+                {//计算能量
+                    joule_per_second = new BigNumber("0");//计算每秒获得的能量值
+                    for (let i = 0; i < locked_id.length; i++) {
+                        if (state_of_unlocked[locked_id[i]] == 'true') {
+                            let tmp = new BigNumber(initial_jps[locked_id[i]]);
+                            //console.log(i, tmp.toFixed(4));
+                            tmp = new BigNumber(initial_jps[locked_id[i]].times(upgrade_ucb_times[locked_id[i]].pow(level_of_machines[locked_id[i]].minus('1'))));
+                            tmp = new BigNumber(tmp.times(upgrade_ucb_times2[locked_id[i]].pow(level_of_machines2[locked_id[i]].minus('1'))));
+                            // tmp = tmp.plus(tmp2);
+                            //console.log(tmp.toFixed(4), initial_jps[locked_id[i]].times(upgrade_ucb_times[locked_id[i]].pow(level_of_machines[locked_id[i]].minus('1'))).toFixed(4));
+                            //console.log(new BigNumber(level_of_machines[locked_id[i]]).div(10), tmp.toFixed(4));
+                            document.getElementById(locked_id[i] + "_current_power").innerHTML = (tmp.lte(capped_of_toExponential) ? tmp.toFixed(2) : tmp.toExponential(2));
+                            //console.log(tmp.toExponential(2));
+                            joule_per_second = joule_per_second.plus(tmp);
+                        }
+                    }
+                    //console.log(joule_per_second.div("40"));
+                    //console.log(joule_per_second.toFixed(20));
+                    //console.log(joule_per_second.div(40).toFixed(20));
+
+                    //console.log(1, energy);
+                    energy = energy.plus(joule_per_second.div("40").times(new BigNumber(tick_per_second).div("40")));
+                    //console.log(2, energy);
+
+                    document.getElementById("total_power").innerHTML = (joule_per_second.lte(capped_of_toExponential) ? joule_per_second.toFixed(2) : joule_per_second.toExponential(2));
+                    document.getElementById("energy").innerHTML = (energy.lte(capped_of_toExponential) ? energy.toFixed(2) : energy.toExponential(2));
+
+                    for (let i = 0; i < locked_id.length; i++) {
+                        if (state_of_unlocked[locked_id[i]] == 'true') {
+                            document.getElementById(locked_id[i] + "_unlock").style.display = 'none';
+                            document.getElementById(locked_id[i] + "_upgrade").style.display = 'block';
+
+                            let tmp = new BigNumber(initial_upgrade_cost[locked_id[i]].times(upgrade_cost_boost[locked_id[i]].pow(level_of_machines[locked_id[i]].minus('1'))));
+                            let tmp2 = new BigNumber(initial_upgrade_cost2[locked_id[i]].times(upgrade_cost_boost2[locked_id[i]].pow(level_of_machines2[locked_id[i]].minus('1'))));
+
+                            document.getElementById(locked_id[i] + "_cost_of_upgrade").innerHTML = (tmp.lte(capped_of_toExponential) ? tmp.toFixed(2) : tmp.toExponential(2));
+                            document.getElementById(locked_id[i] + "_cost_of_upgrade2").innerHTML = (tmp2.lte(capped_of_toExponential) ? tmp2.toFixed(2) : tmp2.toExponential(2));
+                            //console.log(initial_upgrade_cost[locked_id[i]].times(upgrade_cost_boost[locked_id[i]].pow(level_of_machines[locked_id[i]].minus('1'))).toExponential(2));
+                        }
                     }
                 }
-                //console.log(joule_per_second.div("40"));
-                //console.log(joule_per_second.toFixed(20));
-                //console.log(joule_per_second.div(40).toFixed(20));
 
-                //console.log(1, energy);
-                energy = energy.plus(joule_per_second.div("40").times(new BigNumber(tps).div("40")));
-                //console.log(2, energy);
 
-                document.getElementById("total_power").innerHTML = (joule_per_second.lte(new BigNumber('100')) ? joule_per_second.toFixed(2) : joule_per_second.toExponential(2));
-                document.getElementById("energy").innerHTML = (energy.lte(new BigNumber('100')) ? energy.toFixed(2) : energy.toExponential(2));
+                {//计算tps
+                    let tmp = new BigNumber("10").pow(level_of_tps);
+                    document.getElementById("cost_of_tps_upgrade").innerHTML = (tmp.lte(capped_of_toExponential) ? tmp.toFixed(2) : tmp.toExponential(2));
 
-                for (let i = 0; i < locked_id.length; i++) {
-                    if (state_of_unlocked[locked_id[i]] == 'true') {
-                        document.getElementById(locked_id[i] + "_unlock").style.display = 'none';
-                        document.getElementById(locked_id[i] + "_upgrade").style.display = 'block';
-
-                        let tmp = new BigNumber(initial_upgrade_cost[locked_id[i]].times(upgrade_cost_boost[locked_id[i]].pow(level_of_machines[locked_id[i]].minus('1'))).toExponential(2));
-                        let tmp2 = new BigNumber(initial_upgrade_cost2[locked_id[i]].times(upgrade_cost_boost2[locked_id[i]].pow(level_of_machines2[locked_id[i]].minus('1'))).toExponential(2));
-
-                        document.getElementById(locked_id[i] + "_cost_of_upgrade").innerHTML = (tmp.lte(new BigNumber('100')) ? tmp.toFixed(2) : tmp.toExponential(2));
-                        document.getElementById(locked_id[i] + "_cost_of_upgrade2").innerHTML = (tmp2.lte(new BigNumber('100')) ? tmp2.toFixed(2) : tmp2.toExponential(2));
-                        //console.log(initial_upgrade_cost[locked_id[i]].times(upgrade_cost_boost[locked_id[i]].pow(level_of_machines[locked_id[i]].minus('1'))).toExponential(2));
-                    }
                 }
             }
         }
@@ -3629,24 +3816,12 @@
         }
 
 
-        function change_page(page) {
-            let all_ids = get_all_child_ids("page");
-            document.getElementById(page).style.display = 'block';
+        function change_page(father_page, child_page) {
+            let all_ids = get_all_child_ids(father_page);
+            document.getElementById(child_page).style.display = 'block';
             for (let i = 0; i < all_ids.length; i++) {
-                //console.log(all_ids[i], page, all_ids[i] == page);
-                if (all_ids[i] != page) {
-                    document.getElementById(all_ids[i]).style.display = 'none';
-                }
-            }
-        }
-
-
-        function change_page_of_energy(page) {
-            let all_ids = get_all_child_ids("ways_of_energy");
-            document.getElementById(page).style.display = 'block';
-            for (let i = 0; i < all_ids.length; i++) {
-                //console.log(all_ids[i], page, all_ids[i] == page);
-                if (all_ids[i] != page) {
+                //console.log(all_ids[i], child_page, all_ids[i]child_page== page);
+                if (all_ids[i] != child_page) {
                     document.getElementById(all_ids[i]).style.display = 'none';
                 }
             }
@@ -3682,6 +3857,47 @@
             }
         }
 
+
+
+        function open_textbox(operation) {
+            if (operation == 'clearSave') {
+                document.getElementById("front_textbox").style.display = "flex";
+                document.getElementById("front_textbox_text_area").innerHTML = `
+                    <h2>你确定要重置吗？</h2><br>
+                    <div style="color: red; font-weight: bold;">
+                        重置后，所有数据都会被清空，恢复到初始值，且无法撤回，建议备份存档后再进行此操作！
+                    </div>
+                `;
+                document.getElementById("front_textbox_button_area").innerHTML = `
+                    <a href="javascript:clearSave()" style="
+                                                            position: absolute;
+                                                            left: 5%;
+                                                            bottom: 5%;
+                                                            ">
+                        确定
+                    </a>
+                    <a href="javascript:close_textbox()" style="
+                                                            position: absolute;
+                                                            right: 5%;
+                                                            bottom: 5%;
+                                                            ">
+                        取消
+                    </a>
+                `;
+            }
+        }
+        function close_textbox() {
+            document.getElementById("front_textbox").style.display = "none";
+        }
+
+
+        function tps_upgrade(times) {
+            let cost = new BigNumber('10').pow(level_of_tps)
+            if (energy.gte(cost)) {
+                energy.minus(cost);
+                tick_per_second.times(new BigNumber(times));
+            }
+        }
 
     </script>
 
