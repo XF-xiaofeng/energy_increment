@@ -3377,7 +3377,9 @@
                 <div>
                     <div class="discription">
                         速度提升：<br>
-                        通过消耗能量给全局生产速度得到提升：</div>
+                        通过消耗能量给全局生产速度得到提升：<br>
+                        当前: *<span id="now_game_speed" style="font-weight: bold;"></span>
+                    </div>
                     <a href="javascript:tps_upgrade(1.2)" style="color: #0066cc;margin: 3px;
                             border: 2px solid #0066cc;border-radius: 5px;
                             width: 240px;height: 60px;" class="all_center" id="upgrade_tps">
@@ -3395,6 +3397,7 @@
             </div>
         </div>
     </div>
+
 
     <!-- 保存游戏 -->
     <script>
@@ -3631,22 +3634,34 @@
 
 
     <script>
+
+        function dynamicXor(text, keySeq = [0x12, 0x18, 0x1c, 0x1f, 0x27, 0x34]) { //加密s
+            return text.split('').map((c, i) =>
+                String.fromCharCode(c.charCodeAt(0) ^ keySeq[i % keySeq.length])
+            ).join('');
+        }
         function make_gameData_save_string() {
-            game_data.save = "energy:" + energy;
-            game_data.save += "|state_of_unlocked:";
+            let tmp_game_data;
+            tmp_game_data = "energy:" + energy;
+            tmp_game_data += "|state_of_unlocked:";
             for (let i = 0; i < locked_id.length; i++) {
                 //console.log(locked_id[i]);
-                game_data.save += (i > 0 ? "," : "") + locked_id[i] + "=" + (state_of_unlocked[locked_id[i]] == 'true' ? 'true' : 'false');
+                tmp_game_data += (i > 0 ? "," : "") + locked_id[i] + "=" + (state_of_unlocked[locked_id[i]] == 'true' ? 'true' : 'false');
             }
-            game_data.save += "|level_of_machines:";
+            tmp_game_data += "|level_of_machines:";
             for (let i = 0; i < locked_id.length; i++) {
-                game_data.save += (i > 0 ? "," : "") + locked_id[i] + "=" + (level_of_machines[locked_id[i]] == undefined ? 0 : level_of_machines[locked_id[i]]);
+                tmp_game_data += (i > 0 ? "," : "") + locked_id[i] + "=" + (level_of_machines[locked_id[i]] == undefined ? 0 : level_of_machines[locked_id[i]]);
             }
-            game_data.save += "|level_of_machines2:";
+            tmp_game_data += "|level_of_machines2:";
             for (let i = 0; i < locked_id.length; i++) {
-                game_data.save += (i > 0 ? "," : "") + locked_id[i] + "=" + (level_of_machines2[locked_id[i]] == undefined ? 0 : level_of_machines2[locked_id[i]]);
+                tmp_game_data += (i > 0 ? "," : "") + locked_id[i] + "=" + (level_of_machines2[locked_id[i]] == undefined ? 0 : level_of_machines2[locked_id[i]]);
             }
-            game_data.save += "|level_of_tps:" + level_of_tps;
+            tmp_game_data += "|level_of_tps:" + level_of_tps;
+
+            tmp_game_data = dynamicXor(tmp_game_data);
+
+            game_data.save = tmp_game_data;
+
             //console.log(game_data.save);
         }
         function init_all_value() {
@@ -3656,6 +3671,10 @@
             level_of_machines2 = [];
             level_of_tps = new BigNumber("1");
             location.reload();
+        }
+
+        function get_comfortable_number_display(num) {
+            return (num.lte(capped_of_toExponential) ? num.toFixed(2) : num.toExponential(2))
         }
 
         BigNumber.set({ DECIMAL_PLACES: 20 });
@@ -3711,7 +3730,8 @@
             //console.log(temperature_first_load);
 
             if (load_complete == true && temperature_first_load == false) {//读档
-                let read_save = game_data.save.split("|");
+                let code = dynamicXor(game_data.save);
+                let read_save = code.split("|");
                 for (let i = 0; i < read_save.length; i++) {
                     let key = read_save[i].split(":")[0], val = read_save[i].split(":")[1];
                     if (key == "energy") {
@@ -3765,10 +3785,11 @@
                             //console.log(i, tmp.toFixed(4));
                             tmp = new BigNumber(initial_jps[locked_id[i]].times(upgrade_ucb_times[locked_id[i]].pow(level_of_machines[locked_id[i]].minus('1'))));
                             tmp = new BigNumber(tmp.times(upgrade_ucb_times2[locked_id[i]].pow(level_of_machines2[locked_id[i]].minus('1'))));
+                            tmp = new BigNumber(tmp.times(new BigNumber("1.2").pow(level_of_tps.minus('1'))));
                             // tmp = tmp.plus(tmp2);
                             //console.log(tmp.toFixed(4), initial_jps[locked_id[i]].times(upgrade_ucb_times[locked_id[i]].pow(level_of_machines[locked_id[i]].minus('1'))).toFixed(4));
                             //console.log(new BigNumber(level_of_machines[locked_id[i]]).div(10), tmp.toFixed(4));
-                            document.getElementById(locked_id[i] + "_current_power").innerHTML = (tmp.lte(capped_of_toExponential) ? tmp.toFixed(2) : tmp.toExponential(2));
+                            document.getElementById(locked_id[i] + "_current_power").innerHTML = get_comfortable_number_display(tmp);
                             //console.log(tmp.toExponential(2));
                             joule_per_second = joule_per_second.plus(tmp);
                         }
@@ -3781,8 +3802,8 @@
                     energy = energy.plus(joule_per_second.div("40").times(new BigNumber(tick_per_second).div("40")));
                     //console.log(2, energy);
 
-                    document.getElementById("total_power").innerHTML = (joule_per_second.lte(capped_of_toExponential) ? joule_per_second.toFixed(2) : joule_per_second.toExponential(2));
-                    document.getElementById("energy").innerHTML = (energy.lte(capped_of_toExponential) ? energy.toFixed(2) : energy.toExponential(2));
+                    document.getElementById("total_power").innerHTML = get_comfortable_number_display(joule_per_second);
+                    document.getElementById("energy").innerHTML = get_comfortable_number_display(energy);
 
                     for (let i = 0; i < locked_id.length; i++) {
                         if (state_of_unlocked[locked_id[i]] == 'true') {
@@ -3792,8 +3813,8 @@
                             let tmp = new BigNumber(initial_upgrade_cost[locked_id[i]].times(upgrade_cost_boost[locked_id[i]].pow(level_of_machines[locked_id[i]].minus('1'))));
                             let tmp2 = new BigNumber(initial_upgrade_cost2[locked_id[i]].times(upgrade_cost_boost2[locked_id[i]].pow(level_of_machines2[locked_id[i]].minus('1'))));
 
-                            document.getElementById(locked_id[i] + "_cost_of_upgrade").innerHTML = (tmp.lte(capped_of_toExponential) ? tmp.toFixed(2) : tmp.toExponential(2));
-                            document.getElementById(locked_id[i] + "_cost_of_upgrade2").innerHTML = (tmp2.lte(capped_of_toExponential) ? tmp2.toFixed(2) : tmp2.toExponential(2));
+                            document.getElementById(locked_id[i] + "_cost_of_upgrade").innerHTML = get_comfortable_number_display(tmp);
+                            document.getElementById(locked_id[i] + "_cost_of_upgrade2").innerHTML = get_comfortable_number_display(tmp2);
                             //console.log(initial_upgrade_cost[locked_id[i]].times(upgrade_cost_boost[locked_id[i]].pow(level_of_machines[locked_id[i]].minus('1'))).toExponential(2));
                         }
                     }
@@ -3801,9 +3822,10 @@
 
 
                 {//计算tps
-                    let tmp = new BigNumber("10").pow(level_of_tps);
-                    document.getElementById("cost_of_tps_upgrade").innerHTML = (tmp.lte(capped_of_toExponential) ? tmp.toFixed(2) : tmp.toExponential(2));
-
+                    let cost_of_tps_upgrade = new BigNumber("10").pow(level_of_tps);
+                    document.getElementById("cost_of_tps_upgrade").innerHTML = get_comfortable_number_display(cost_of_tps_upgrade);
+                    let now_game_speed = new BigNumber('1.2').pow(level_of_tps);
+                    document.getElementById("now_game_speed").innerHTML = get_comfortable_number_display(now_game_speed);
                 }
             }
         }
@@ -3869,18 +3891,10 @@
                     </div>
                 `;
                 document.getElementById("front_textbox_button_area").innerHTML = `
-                    <a href="javascript:clearSave()" style="
-                                                            position: absolute;
-                                                            left: 5%;
-                                                            bottom: 5%;
-                                                            ">
+                    <a href="javascript:clearSave()" style="position: absolute; left: 5%; bottom: 5%;">
                         确定
                     </a>
-                    <a href="javascript:close_textbox()" style="
-                                                            position: absolute;
-                                                            right: 5%;
-                                                            bottom: 5%;
-                                                            ">
+                    <a href="javascript:close_textbox()" style="position: absolute; right: 5%; bottom: 5%;">
                         取消
                     </a>
                 `;
@@ -3893,9 +3907,13 @@
 
         function tps_upgrade(times) {
             let cost = new BigNumber('10').pow(level_of_tps)
+            // console.log(level_of_tps.toFixed(2));
+            // console.log(cost.toFixed(2), energy.toFixed(2));
             if (energy.gte(cost)) {
-                energy.minus(cost);
-                tick_per_second.times(new BigNumber(times));
+                // console.log(111);
+                energy = energy.minus(cost);
+                level_of_tps = level_of_tps.plus("1");
+                // console.log(level_of_tps.toFixed(2));
             }
         }
 
